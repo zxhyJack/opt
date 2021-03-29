@@ -1,18 +1,13 @@
 /***************Differential Evolution Algorithm*************************/
-/*
-* @Author: Gong Xu
-* (c) Copyright 2018 ，DSP Laboratory of Lanzhou University of Technology, All rights reserved. 
-*
-*/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
-#define nVar 30  // Number of variables
+#define nVar 10  // Number of variables
 #define NP 50    // Number of Population
-#define Iter 600 // Maximum number of iterations
+#define Iter 200 // Maximum number of iterations
 
 struct Individual
 {
@@ -38,8 +33,9 @@ double function_fitness(double *var)
     double result = 0;
     for (int i = 0; i < nVar; i++)
     {
-        result += *(var + i) * *(var + i); // method one : pointer
-                                           //result += var[i] * var[i];     // method two : array
+        // result += *(var + i) * *(var + i); // method one : pointer
+        result += var[i] * var[i];
+                                            //result += var[i] * var[i];     // method two : array
     }
     return result;
 }
@@ -161,11 +157,12 @@ void runDE(double F, double CR, double x_low_bound, double x_up_bound, double (*
 void main(void)
 { // Test the running time of the program . including time.h
     printf("the program is running!\n");
-    // clock_t pro_start, pro_finished;
-    // pro_start = clock();
+    clock_t pro_start, pro_finished;
+    pro_start = clock();
     runDE(0.5, 0.4, -10.0, 10.0, function_fitness);
-    // pro_finished = clock();
-    // double Total_time = (double)(pro_finished - pro_start) / CLOCKS_PER_SEC;
-    // printf("the program ran for : %3f second", Total_time);
+    pro_finished = clock();
+    double Total_time = (double)(pro_finished - pro_start) / CLOCKS_PER_SEC;
+    printf("\n");
+    printf("The program ran for : %f second\n", Total_time);
     // system("pause");
 }
