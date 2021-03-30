@@ -4,30 +4,31 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <math.h>
 
-#define nVar 10  // Number of variables
+#define D 10     // Number of variables
 #define NP 50    // Number of Population
-#define Iter 500 // Maximum number of iterations
+#define Iter 300 // Maximum number of iterations
 
 struct DE
 {
-    double X[NP][nVar];
+    double X[NP][D];
     double F;
     double CR;
     double (*function)(double *); // Function pointer definition
     double global_fitness;
-    double global_solution[nVar];
+    double global_solution[D];
     double x_low_bound;
     double x_up_bound;
 };
 
 // sum(X^2)
-double calculate_fitness(double var[nVar])
+double calculate_fitness(double params[D])
 {
     double result = 0;
-    for (int i = 0; i < nVar; i++)
+    for (int i = 0; i < D; i++)
     {
-        result += *(var + i) * *(var + i); // method one : pointer
+        result += *(params + i) * *(params + i); // method one : pointer
         // result += var[i] * var[i];     // method two : array
     }
     return result;
@@ -48,16 +49,16 @@ void runDE(double F, double CR, double x_low_bound, double x_up_bound, double (*
     // inital population
     for (int i = 0; i < NP; i++)
     {
-        for (int j = 0; j < nVar; j++)
+        for (int j = 0; j < D; j++)
         {
             double randx = (double)rand() / RAND_MAX;
             de.X[i][j] = de.x_low_bound + (de.x_up_bound - de.x_low_bound) * randx;
         }
     }
-    memcpy(&de.global_solution, &de.X[0], sizeof(double) * nVar);
+    memcpy(&de.global_solution, &de.X[0], sizeof(double) * D);
     de.global_fitness = calculate_fitness(de.X[0]);
-    double V[NP][nVar];
-    double U[NP][nVar];
+    double V[NP][D];
+    double U[NP][D];
     /* End of initialization */
 
     for (int iter = 1; iter <= Iter; iter++)
@@ -65,17 +66,27 @@ void runDE(double F, double CR, double x_low_bound, double x_up_bound, double (*
         // mutate
         for (int i = 0; i < NP; i++)
         {
+            int r1, r2, r3;
             // r1,r2,r3 random and different
-            int r1 = (int)rand() % NP;
-            int r2 = (int)rand() % NP;
-            int r3 = (int)rand() % NP;
-            while (r1 == i || r2 == i || r3 == i || r1 == r2 || r2 == r3 || r1 == r3)
+            do
             {
                 r1 = (int)rand() % NP;
+            } while (r1 == i);
+            do
+            {
                 r2 = (int)rand() % NP;
+            } while (r2 == i || r2 == r1);
+            do
+            {
                 r3 = (int)rand() % NP;
-            }
-            for (int j = 0; j < nVar; j++)
+            } while (r3 == i || r3 == r1 || r3 == r2);
+            // do
+            // {
+            //     r1 = (int)rand() % NP;
+            //     r2 = (int)rand() % NP;
+            //     r3 = (int)rand() % NP;
+            // } while (r1 == i || r2 == i || r3 == i || r1 == r2 || r2 == r3 || r1 == r3);
+            for (int j = 0; j < D; j++)
             {
                 V[i][j] = de.X[r1][j] + F * (de.X[r2][j] - de.X[r3][j]);
                 // limit of bound
@@ -87,8 +98,8 @@ void runDE(double F, double CR, double x_low_bound, double x_up_bound, double (*
         //crossover
         for (int i = 0; i < NP; i++)
         {
-            int randc = (int)rand() % nVar;
-            for (int j = 0; j < nVar; j++)
+            int randc = (int)rand() % D;
+            for (int j = 0; j < D; j++)
             {
                 double rand_cr = (double)rand() / RAND_MAX;
                 U[i][j] = ((j == randc) || (rand_cr <= de.CR)) ? V[i][j] : de.X[i][j];
@@ -105,13 +116,19 @@ void runDE(double F, double CR, double x_low_bound, double x_up_bound, double (*
             double u_fitness = calculate_fitness(U[i]);
             if (u_fitness < x_fitness)
             {
-                memcpy(&de.X[i], &U[i], sizeof(double) * nVar);
+                // memcpy(&de.X[i], &U[i], sizeof(double) * D);
+                for (int j = 0; j < D; j++)
+                {
+                    de.X[i][j] = U[i][j];
+                }
             }
             x_fitness = calculate_fitness(de.X[i]);
             if (x_fitness < de.global_fitness)
             {
                 de.global_fitness = x_fitness;
-                memcpy(&de.global_solution, &de.X[i], sizeof(double) * nVar);
+                // memcpy(&de.global_solution, &de.X[i], sizeof(double) * D);
+                for (int j = 0; j < D; j++)
+                    de.global_solution[j] = de.X[i][j];
             }
         }
 
@@ -119,7 +136,7 @@ void runDE(double F, double CR, double x_low_bound, double x_up_bound, double (*
     }
     printf("The iteration is end, show the soultion and fitness!\n");
     printf("global_fitness :%f\n", de.global_fitness);
-    for (int i = 0; i < nVar; i++)
+    for (int i = 0; i < D; i++)
     {
         printf("%f,", de.global_solution[i]);
     }
@@ -133,7 +150,8 @@ void main(void)
     runDE(0.5, 0.4, -10.0, 10.0, calculate_fitness);
     finished = clock();
     double Total_time = (double)(finished - start) / CLOCKS_PER_SEC;
-    printf("\n");
+    // printf("\n");
+    puts("");
     printf("The program ran for : %f second\n", Total_time);
     // system("pause");
 }

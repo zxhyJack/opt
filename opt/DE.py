@@ -55,15 +55,6 @@ class DE:
         self.max_iter = max_iter
         self.prob_mut = prob_mut  # probability of mutation
         # constraint:
-        self.has_constraint = len(constraint_eq) > 0 or len(constraint_ueq) > 0
-        self.constraint_eq = list(
-            constraint_eq
-        )  # a list of unequal constraint functions with c[i] <= 0
-        self.constraint_ueq = list(
-            constraint_ueq
-        )  # a list of equal functions with ceq[i] = 0
-
-        self.Chrom = None
         self.X = None  # shape = (size_pop, n_dim)
         self.Y_raw = None  # shape = (size_pop,) , value is f(x)
         self.Y = None  # shape = (size_pop,) , value is f(x) + penalty for constraint
@@ -92,29 +83,10 @@ class DE:
         )
         return self.X
 
-    def chrom2x(self, Chrom):
-        pass
-
     def x2y(self):
             self.Y_raw = self.func(self.X)
-            if not self.has_constraint:
-                self.Y = self.Y_raw
-            else:
-                # constraint
-                penalty_eq = np.array(
-                    [np.sum(np.abs([c_i(x) for c_i in self.constraint_eq])) for x in self.X]
-                )
-                penalty_ueq = np.array(
-                    [
-                        np.sum(np.abs([max(0, c_i(x)) for c_i in self.constraint_ueq]))
-                        for x in self.X
-                    ]
-                )
-                self.Y = self.Y_raw + 1e5 * penalty_eq + 1e5 * penalty_ueq
+            self.Y = self.Y_raw
             return self.Y
-
-    def ranking(self):
-        pass
 
     def selection(self):
         """
@@ -126,7 +98,6 @@ class DE:
         f_U = self.x2y()
 
         self.X = np.where((f_X < f_U).reshape(-1, 1), X, U)
-        return self.X
 
     def crossover(self):
         """
@@ -134,7 +105,6 @@ class DE:
         """
         mask = np.random.rand(self.size_pop, self.n_dim) < self.prob_mut
         self.U = np.where(mask, self.V, self.X)
-        return self.U
 
     def mutation(self):
         """
@@ -152,12 +122,11 @@ class DE:
         self.V = X[r1, :] + self.F * (X[r2, :] - X[r3, :])
 
         # the lower & upper bound still works in mutation
-        mask = np.random.uniform(
-            low=self.lb, high=self.ub, size=(self.size_pop, self.n_dim)
-        )
-        self.V = np.where(self.V < self.lb, mask, self.V)
-        self.V = np.where(self.V > self.ub, mask, self.V)
-        return self.V
+        # mask = np.random.uniform(
+        #     low=self.lb, high=self.ub, size=(self.size_pop, self.n_dim)
+        # )
+        self.V = np.where(self.V < self.lb, self.lb, self.V)
+        self.V = np.where(self.V > self.ub, self.ub, self.V)
 
     def run(self):
         for i in range(self.max_iter):
