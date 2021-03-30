@@ -1,5 +1,5 @@
 """
-Differential Evolution
+Differential Evolution without numpy
 """
 import random
 
