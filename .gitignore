@@ -4,3 +4,4 @@ __pycache__
 *.exe
 tempCodeRunnerFile.c
 DE_rewrite.exe
+.mypy_cache
