@@ -112,7 +112,7 @@ if __name__ == "__main__":
     de = DE(
         NP=50,
         D=10,
-        max_iter=3000,
+        max_iter=300,
         x_low_bound=-10,
         x_up_bound=10,
         F=0.5,

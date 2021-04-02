@@ -1,5 +1,6 @@
 scikit-opt
 .vscode
 __pycache__
-.exe
+*.exe
 tempCodeRunnerFile.c
+DE_rewrite.exe
