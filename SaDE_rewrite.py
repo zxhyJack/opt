@@ -35,6 +35,7 @@ class SaDE:
             self.population.append(lp)
 
     def evaluatePopulation(self):
+        self.fpopulation = []
         for i in self.population:
             self.fpopulation.append(self.fitness(i))
 
@@ -113,11 +114,11 @@ class SaDE:
         crPeriod = 5
         crmUpdatePeriod = 25
         start = time.time()
+
         # start the algorithm
         best = []  # global best positions
-        fbest = 0.00  # fitness of global best position
+        fbest = 0.00  # global best fitness
         result = []
-        # global best fitness
         if self.maximize == True:
             fbest = 0.00
         else:
@@ -136,9 +137,9 @@ class SaDE:
         for iter in range(self.max_iter):
             avrFit = 0.00
             strategy = 0
+            # self.evaluatePopulation()
             for i in range(0, self.NP):
-                # generate weight factor values
-                F = random.normalvariate(0.5, 0.3)
+                F = random.normalvariate(0.5, 0.3)  # generate weight factor values
                 if random.uniform(0, 1) < p1:
                     candidateSolution = self.rand_1_bin(
                         self.population[i],
@@ -194,15 +195,15 @@ class SaDE:
                     "iter": iter,
                     "fbest": round(fbest, 3),
                     "avrFit": round(avrFit, 3),
-                    "elapTime": round((time.time() - start) * 1000.0, 3),
+                    "elapTime/ms": round((time.time() - start) * 1000.0, 3),
                 }
             )
-
             if iter % crPeriod == 0 and iter != 0:
                 crossover_rate = [
-                    random.normalvariate(crm, 0.1) for iter in range(self.NP)
+                    random.normalvariate(crm, 0.1) for i in range(self.NP)
                 ]
                 if iter % crmUpdatePeriod == 0:
+                    # print(iter, len(cr_list))
                     crm = sum(cr_list) / len(cr_list)
                     cr_list = []
 
@@ -213,7 +214,9 @@ class SaDE:
                 ns2 = 0
                 nf1 = 0
                 nf2 = 0
+
         return result
+
 
 if __name__ == "__main__":
     # fitness_function
@@ -232,5 +235,5 @@ if __name__ == "__main__":
         func_fitness=func_fitness,
         max_iter=200,
     )
-    p.run()
-    for i in p.run(): print(i)
+    for i in p.run():
+        print(i)
