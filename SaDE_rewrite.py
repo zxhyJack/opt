@@ -228,7 +228,7 @@ if __name__ == "__main__":
         dim=4,
         bounds=bounds,
         func_fitness=func_fitness,
-        max_iter=200,
+        max_iter=100,
     )
     for i in p.run():
         print(i)
