@@ -196,9 +196,7 @@ class DE:
                 operatorStr,
             )
         )
-        results.write(
-            "=================================================================================================================\n"
-        )
+        results.write("============================================================\n")
         records.write(
             "ID: %s\tDate: %s\tRuns: %s\tOperator: %s\n"
             % (
@@ -208,9 +206,7 @@ class DE:
                 operatorStr,
             )
         )
-        records.write(
-            "=================================================================================================================\n"
-        )
+        records.write("============================================================\n")
         avr_fbest_r = []
         avr_diversity_r = []
         fbest_r = []
@@ -310,9 +306,7 @@ class DE:
         fbestAux = [sum(x) / len(x) for x in zip(*avr_fbest_r)]
         diversityAux = [sum(x) / len(x) for x in zip(*avr_diversity_r)]
         self.generateGraphs(fbestAux, diversityAux, max_iterations, uid, "Overall")
-        records.write(
-            "================================================================================================================="
-        )
+        records.write("============================================================\n")
         if maximize == False:
             results.write("Gbest Overall: %.4f\n" % (min(fbest_r)))
             results.write(
@@ -338,14 +332,10 @@ class DE:
             results.write(
                 "Elappsed Time Standard Deviation: %.4f\n" % (stdev(elapTime_r))
             )
-        results.write(
-            "=================================================================================================================\n"
-        )
+        results.write("============================================================\n")
 
 
 if __name__ == "__main__":
-    from de import DE
-
     max_iterations = 100
     pop_size = 20
     dim = 2
